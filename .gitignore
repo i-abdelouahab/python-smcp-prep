@@ -1,0 +1,9 @@
+# Byte-compiled files and caches
+__pycache__/
+*.py[cod]
+
+# IDE files (PyCharm)
+.idea/
+
+# Test cache and coverage reports
+.coverage
