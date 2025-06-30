@@ -1,0 +1,42 @@
+name: SMCP simple library deployment CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.2"
+
+      - name: Install pre-commit hook
+        run: poetry run pip install pre-commit
+
+      - name: Install pytest and pytest-cov
+        run: poetry run pip install pytest pytest-cov
+
+      - name: Install mypy
+        run: poetry run pip install mypy
+
+      - name: Run pre-commit hooks
+        run: poetry run pre-commit run --all-files
+
+      - name: Run mypy
+        run: poetry run mypy cash_register
+
+      - name: Run tests with coverage
+        run: poetry run pytest --cov=cash_register --cov-fail-under=80
