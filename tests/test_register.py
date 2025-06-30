@@ -1,7 +1,9 @@
 # test register.py
 
 import unittest
-from cash_register.exceptions import NegativePriceError, DiscountError
+from decimal import Decimal
+
+from cash_register.exceptions import DiscountError, NegativePriceError
 from cash_register.register import CashRegister
 
 
@@ -16,7 +18,7 @@ class TestRegister(unittest.TestCase):
     def test_running_total(self):
         """Return running total."""
         # assert
-        self.assertEqual(self.cash_register.total(), 2482.8)
+        self.assertEqual(self.cash_register.total(), Decimal("2482.80"))
 
     def test_reset(self):
         """Return reset cash register."""
@@ -35,8 +37,9 @@ class TestRegister(unittest.TestCase):
         item_price = -100.50
 
         # assert
-        self.assertRaises(NegativePriceError, self.cash_register.scan_item, item_sku, item_price)
-
+        self.assertRaises(
+            NegativePriceError, self.cash_register.scan_item, item_sku, item_price
+        )
 
     def test_total_with_discount_10_percent(self):
         """Return total with discount."""
@@ -44,21 +47,20 @@ class TestRegister(unittest.TestCase):
         self.cash_register.apply_discount(12)
 
         # assert
-        self.assertLess(self.cash_register.total(), 2482.8)
-        self.assertEqual(self.cash_register.total(), 2184.864)
-
+        self.assertLess(self.cash_register.total(), Decimal("2482.80"))
+        self.assertEqual(self.cash_register.total(), Decimal("2184.86"))
 
     def test_total_after_discount_removal(self):
         """Return total after discount removal."""
         # arrange and verify discounted total
         self.cash_register.apply_discount(12)
-        self.assertLess(self.cash_register.total(), 2482.8)
+        self.assertLess(self.cash_register.total(), Decimal("2482.80"))
 
         # act
         self.cash_register.remove_discount()
 
         # assert
-        self.assertEqual(self.cash_register.total(), 2482.8)
+        self.assertEqual(self.cash_register.total(), Decimal("2482.80"))
 
     def test_invalid_discount(self):
         """Return invalid discount."""
@@ -68,4 +70,20 @@ class TestRegister(unittest.TestCase):
         # assert
         self.assertRaises(DiscountError, self.cash_register.apply_discount, discount)
 
+    def test_receipt_accuracy(self):
+        """Return correct receipt with discount."""
+        # act
+        self.cash_register.apply_discount(Decimal("12"))
+        receipt = self.cash_register.to_receipt()
 
+        # assert receipt
+        self.assertEqual(receipt.total_brut, Decimal("2482.80"))
+        self.assertEqual(receipt.discount_pct, Decimal("12"))
+        self.assertEqual(receipt.total_due, Decimal("2184.86"))
+        self.assertEqual(len(receipt.items), 3)
+
+        # assert an item
+        item = receipt.items[0]
+        self.assertEqual(item.sku, "SKU001")
+        self.assertEqual(item.qty, 1)
+        self.assertEqual(item.unit_price, Decimal("13.5"))

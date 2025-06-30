@@ -1,65 +1,56 @@
-from cash_register.exceptions import NegativePriceError, DiscountError
+from decimal import Decimal
+
+from cash_register.exceptions import DiscountError, NegativePriceError
+from cash_register.models import LineItem, Receipt
 
 
 class CashRegister:
     """Basic cash register for SMCP store."""
 
-    def __init__(self, discount = 0.0):
-        """Initialize the list of items."""
+    def __init__(self, discount: Decimal = Decimal("0.0")):
         self.discount = discount
-        self.items = []
+        self.items: list[LineItem] = []
 
-    def scan_item(self, sku: str, price: float, quantity: int = 1) :
-        """
-        Scan and add an item to the cash register list.
-
-        :param sku: sku of the item.
-        :param price: price of the item.
-        :param quantity: quantity of the item.
-        :return: cash register.
-        """
-        if price < 0 :
+    def scan_item(self, sku: str, price: Decimal, quantity: int = 1) -> None:
+        """Scan and add an item to the cash register list."""
+        if price <= 0:
             raise NegativePriceError(price)
-        else :
-            item = dict()
-            item["sku"] = sku
-            item["discounted_price"] = price
-            item["price"] = price
-            item["quantity"] = quantity
-            self.items.append(item)
 
-    def total(self) -> float:
-        """
-        Calculate the total cash register.
+        item = LineItem(sku=sku, unit_price=price, qty=quantity)
+        self.items.append(item)
 
-        :return: (float) total cash register.
-        """
-        total = 0
-        for item in self.items:
-            if self.discount > 0.0 :
-                total += item["discounted_price"] * item["quantity"]
-            else:
-                total += item["price"] * item["quantity"]
+    def total(self) -> Decimal:
+        """Calculate total after discount."""
+        total = Decimal(sum((item.unit_price * item.qty for item in self.items)))
 
-        return total
+        if self.discount > 0:
+            total = Decimal(total * (100 - self.discount) / 100)
 
-    def reset(self):
+        return total.quantize(Decimal("0.01"))
+
+    def reset(self) -> None:
         """Reset the cash register."""
         self.items.clear()
+        self.discount = Decimal("0.0")
 
-    def apply_discount(self, percent: float):
-        """Apply discount to the cash register."""
-        if percent < 0 or percent > 100 :
+    def apply_discount(self, percent: Decimal) -> None:
+        """Apply discount to the total."""
+        if percent <= 0 or percent >= 100:
             raise DiscountError(percent)
-        else :
-            self.discount = percent
+        self.discount = percent
 
-        for item in self.items :
-            item["discounted_price"] = item["price"] * (100 - self.discount) / 100
+    def remove_discount(self) -> None:
+        """Remove any discount."""
+        self.discount = Decimal("0.0")
 
+    def to_receipt(self) -> Receipt:
+        """Generate a Receipt dataclass with details."""
+        total_brut = Decimal(sum(item.unit_price * item.qty for item in self.items))
+        total_due = self.total()
 
-    def remove_discount(self):
-        """Remove discount from the cash register."""
-        self.discount = 0.0
-        for item in self.items :
-            item["discounted_price"] = item["price"]
+        return Receipt(
+            items=self.items.copy(),
+            total_brut=total_brut.quantize(Decimal("0.01")),
+            discount_pct=self.discount,
+            total_due=total_due,
+        )
