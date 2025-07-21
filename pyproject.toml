@@ -3,11 +3,17 @@ name = "python-smcp-prep"
 version = "0.1.1"
 description = "Small Python library that models a basic cash register for an SMCP store."
 authors = [
-    {name = "Ismail Abdelouahab <ismailabdelouahab0@gmail.com"}
+    {name = "Ismail Abdelouahab <ismailabdelouahab0@gmail.com>"}
 ]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "pytest-cov (>=6.2.1,<7.0.0)",
+    "flake8 (>=7.3.0,<8.0.0)",
+    "black (>=25.1.0,<26.0.0)",
+    "isort (>=6.0.1,<7.0.0)",
+    "mypy (>=1.17.0,<2.0.0)",
+    "pytest (>=8.4.1,<9.0.0)"
 ]
 
 [tool.black]

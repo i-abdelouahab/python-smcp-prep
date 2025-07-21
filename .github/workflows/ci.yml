@@ -23,17 +23,8 @@ jobs:
         with:
           poetry-version: "1.8.2"
 
-      - name: Install pre-commit hook
-        run: poetry run pip install pre-commit
-
-      - name: Install pytest and pytest-cov
-        run: poetry run pip install pytest pytest-cov
-
-      - name: Install mypy
-        run: poetry run pip install mypy
-
-      - name: Run pre-commit hooks
-        run: poetry run pre-commit run --all-files
+      - name: Install Dependencies
+        run: poetry install --no-root
 
       - name: Run mypy
         run: poetry run mypy cash_register
