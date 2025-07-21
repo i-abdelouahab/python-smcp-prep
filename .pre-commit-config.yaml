@@ -3,20 +3,23 @@ repos:
     hooks:
       - id: black
         name: black
-        entry: poetry run black
+        entry: poetry run black .
         language: system
         types: [python]
+        always_run: true
 
       - id: isort
         name: isort
-        entry: poetry run isort
+        entry: poetry run isort .
         language: system
         types: [python]
+        always_run: true
 
       - id: flake8
         name: flake8
-        entry: poetry run flake8
+        entry: poetry run flake8 .
         language: system
         types: [python]
+        always_run: true
         args: [--max-line-length=88, --extend-ignore=E501]
 

@@ -1,20 +1,24 @@
-[project]
+[tool.poetry]
 name = "python-smcp-prep"
 version = "0.1.1"
 description = "Small Python library that models a basic cash register for an SMCP store."
-authors = [
-    {name = "Ismail Abdelouahab <ismailabdelouahab0@gmail.com>"}
-]
+authors = ["Ismail Abdelouahab <ismailabdelouahab0@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "pytest-cov (>=6.2.1,<7.0.0)",
-    "flake8 (>=7.3.0,<8.0.0)",
-    "black (>=25.1.0,<26.0.0)",
-    "isort (>=6.0.1,<7.0.0)",
-    "mypy (>=1.17.0,<2.0.0)",
-    "pytest (>=8.4.1,<9.0.0)"
-]
+packages = [{ include = "cash_register" }]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+pytest = ">=8.4.1,<9.0.0"
+pytest-cov = ">=6.2.1,<7.0.0"
+flake8 = ">=7.3.0,<8.0.0"
+black = ">=25.1.0,<26.0.0"
+isort = ">=6.0.1,<7.0.0"
+mypy = ">=1.17.0,<2.0.0"
+pre-commit = "^4.2.0"
+
+[tool.poetry.scripts]
+test = "pytest"
+coverage = "pytest --cov=cash_register --cov-report=term-missing"
 
 [tool.black]
 line-length = 88
@@ -31,25 +35,6 @@ extend-ignore = ["E501", "E203", "W503"]
 disallow_untyped_defs = true
 ignore_missing_imports = true
 strict = false
-
-[tool.poetry]
-name = "python-smcp-prep"
-version = "0.1.1"
-description = "Small Python library that models a basic cash register for an SMCP store."
-authors = ["Ismail Abdelouahab <ismailabdelouahab0@gmail.com>"]
-
-[tool.poetry.scripts]
-test = "pytest"
-coverage = "pytest --cov=cash_register --cov-report=term-missing"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.4.1"
-pytest-cov = "^6.2.1"
-black = "^25.1.0"
-isort = "^6.0.1"
-flake8 = "^7.3.0"
-mypy = "^1.16.1"
-pre-commit = "^4.2.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
